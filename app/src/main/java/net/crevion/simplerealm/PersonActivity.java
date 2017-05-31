@@ -1,13 +1,18 @@
 package net.crevion.simplerealm;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 
 import net.crevion.simplerealm.model.Person;
 
@@ -30,7 +35,7 @@ public class PersonActivity extends AppCompatActivity {
 
         realm = Realm.getDefaultInstance();
 
-        deleteAllPerson();
+//        deleteAllPerson();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -39,11 +44,28 @@ public class PersonActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Person person = new Person();
-                person.setName("Yusuf Aji Wibowo");
-                person.setAge(24);
-                addPerson(person);
+                AlertDialog.Builder builder = new AlertDialog.Builder(PersonActivity.this);
+                LayoutInflater inflater = LayoutInflater.from(getBaseContext());
 
+                final View viewDialog = inflater.inflate(R.layout.form_input, null);
+                builder.setView(viewDialog)
+                        .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                Person person = new Person();
+                                person.setName(((EditText)viewDialog.findViewById(R.id.name)).getText().toString());
+                                person.setAge(Integer.parseInt(((EditText)viewDialog.findViewById(R.id.age)).getText().toString()));
+                                addPerson(person);
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
                 refreshListPerson();
             }
         });

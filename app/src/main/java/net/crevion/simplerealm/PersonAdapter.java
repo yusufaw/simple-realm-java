@@ -46,20 +46,20 @@ class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.ViewHolder> {
         ViewHolder(View itemView) {
             super(itemView);
             textViewPersonName = (TextView) itemView.findViewById(R.id.text_person_name);
-            textViewPersonAge= (TextView) itemView.findViewById(R.id.text_person_age);
+            textViewPersonAge = (TextView) itemView.findViewById(R.id.text_person_age);
         }
     }
 
-    PersonAdapter(List<Person> listPerson){
+    PersonAdapter(List<Person> listPerson) {
         Log.d(TAG, "PersonAdapter: ");
         this.listPerson = listPerson;
     }
 
-    PersonAdapter(){
+    PersonAdapter() {
 
     }
 
-    void updateListPerson(List<Person> listPerson){
+    void updateListPerson(List<Person> listPerson) {
         this.listPerson = listPerson;
     }
 }
