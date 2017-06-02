@@ -5,4 +5,5 @@
     <string name="age">Age</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="empty">No data stored in Realm</string>
 </resources>
