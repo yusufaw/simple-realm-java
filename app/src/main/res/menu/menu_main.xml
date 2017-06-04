@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="net.crevion.menuapp.MainActivity">
+    <item
+        android:id="@+id/change_list_a"
+        android:orderInCategory="100"
+        android:title="@string/change_list_a"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/change_list_b"
+        android:orderInCategory="100"
+        android:title="@string/change_list_b"
+        app:showAsAction="never" />
+</menu>

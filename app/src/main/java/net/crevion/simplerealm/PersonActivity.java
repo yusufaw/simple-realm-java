@@ -9,6 +9,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -18,10 +20,11 @@ import net.crevion.simplerealm.model.Person;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class PersonActivity extends AppCompatActivity {
 
-    private Realm realm;
+    private Realm realmPersonA, realmPersonB, currentRealm;
     private PersonAdapter personAdapter;
 
     private TextView textViewEmpty;
@@ -32,7 +35,21 @@ public class PersonActivity extends AppCompatActivity {
         setContentView(R.layout.activity_person);
 
         textViewEmpty = (TextView) findViewById(R.id.empty);
-        realm = Realm.getDefaultInstance();
+        
+        RealmConfiguration personAConfig = new RealmConfiguration.Builder()
+                .name("personA.currentRealm")
+                .schemaVersion(1)
+                .build();
+
+        RealmConfiguration personBConfig = new RealmConfiguration.Builder()
+                .name("personB.currentRealm")
+                .schemaVersion(1)
+                .build();
+
+        realmPersonA = Realm.getInstance(personAConfig);
+        realmPersonB = Realm.getInstance(personBConfig);
+        currentRealm = realmPersonA;
+
 
 //        deleteAllPerson();
 
@@ -79,7 +96,7 @@ public class PersonActivity extends AppCompatActivity {
     }
 
     private void addPerson(final Person p) {
-        realm.executeTransaction(new Realm.Transaction() {
+        currentRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 Person person = realm.createObject(Person.class);
@@ -92,11 +109,11 @@ public class PersonActivity extends AppCompatActivity {
     }
 
     private List<Person> getAllPerson(){
-        return realm.where(Person.class).findAll();
+        return currentRealm.where(Person.class).findAll();
     }
 
     private void deleteAllPerson(){
-        realm.executeTransaction(new Realm.Transaction() {
+        currentRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 realm.delete(Person.class);
@@ -113,6 +130,29 @@ public class PersonActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        realm.close();
+        currentRealm.close();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.change_list_a) {
+            currentRealm = realmPersonA;
+            refreshListPerson();
+            return true;
+        } else if (id == R.id.change_list_b) {
+            currentRealm = realmPersonB;
+            refreshListPerson();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
