@@ -16,17 +16,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import net.crevion.simplerealm.model.Person;
-
-import java.util.List;
-
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
+import net.crevion.simplerealm.service.PersonService;
 
 public class PersonActivity extends AppCompatActivity {
 
-    private Realm realmPersonA, realmPersonB, currentRealm;
     private PersonAdapter personAdapter;
-
+    private PersonService personService;
     private TextView textViewEmpty;
 
     @Override
@@ -35,23 +30,8 @@ public class PersonActivity extends AppCompatActivity {
         setContentView(R.layout.activity_person);
 
         textViewEmpty = (TextView) findViewById(R.id.empty);
-        
-        RealmConfiguration personAConfig = new RealmConfiguration.Builder()
-                .name("personA.currentRealm")
-                .schemaVersion(1)
-                .build();
 
-        RealmConfiguration personBConfig = new RealmConfiguration.Builder()
-                .name("personB.currentRealm")
-                .schemaVersion(1)
-                .build();
-
-        realmPersonA = Realm.getInstance(personAConfig);
-        realmPersonB = Realm.getInstance(personBConfig);
-        currentRealm = realmPersonA;
-
-
-//        deleteAllPerson();
+        personService = new PersonService();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -71,7 +51,7 @@ public class PersonActivity extends AppCompatActivity {
                                 Person person = new Person();
                                 person.setName(((EditText)viewDialog.findViewById(R.id.name)).getText().toString());
                                 person.setAge(Integer.parseInt(((EditText)viewDialog.findViewById(R.id.age)).getText().toString()));
-                                addPerson(person);
+                                personService.addPerson(person);
                                 refreshListPerson();
                             }
                         })
@@ -95,42 +75,16 @@ public class PersonActivity extends AppCompatActivity {
         refreshListPerson();
     }
 
-    private void addPerson(final Person p) {
-        currentRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Person person = realm.createObject(Person.class);
-                person.setId(1);
-                person.setName(p.getName());
-                person.setAge(p.getAge());
-
-            }
-        });
-    }
-
-    private List<Person> getAllPerson(){
-        return currentRealm.where(Person.class).findAll();
-    }
-
-    private void deleteAllPerson(){
-        currentRealm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.delete(Person.class);
-            }
-        });
-    }
-
     private void refreshListPerson(){
-        textViewEmpty.setVisibility(getAllPerson().size() > 0 ? View.GONE : View.VISIBLE);
-        personAdapter.updateListPerson(getAllPerson());
+        textViewEmpty.setVisibility(personService.getAllPerson().size() > 0 ? View.GONE : View.VISIBLE);
+        personAdapter.updateListPerson(personService.getAllPerson());
         personAdapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        currentRealm.close();
+        personService.close();
     }
 
     @Override
@@ -144,11 +98,11 @@ public class PersonActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.change_list_a) {
-            currentRealm = realmPersonA;
+            personService.setCurrentRealm(personService.getRealmPersonA());
             refreshListPerson();
             return true;
         } else if (id == R.id.change_list_b) {
-            currentRealm = realmPersonB;
+            personService.setCurrentRealm(personService.getRealmPersonB());
             refreshListPerson();
             return true;
         }
