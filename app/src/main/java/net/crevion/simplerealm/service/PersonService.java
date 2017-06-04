@@ -24,6 +24,10 @@ public class PersonService {
                 .name("personB.currentRealm")
                 .schemaVersion(1)
                 .build();
+
+        setRealmPersonA(Realm.getInstance(personAConfig));
+        setRealmPersonB(Realm.getInstance(personBConfig));
+        setCurrentRealm(realmPersonA);
     }
 
     public Realm getRealmPersonA() {
